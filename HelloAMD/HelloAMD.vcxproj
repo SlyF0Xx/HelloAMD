@@ -71,12 +71,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\AMD APP SDK\3.0\include\CL;C:\Users\SlyFox\AMD APP SDK\3.0\include\SDKUtil;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files %28x86%29\AMD APP SDK\3.0\include;C:\Users\SlyFox\AMD APP SDK\3.0\include\SDKUtil;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files %28x86%29\AMD APP SDK\3.0\lib\x86_64;C:\Users\SlyFox\AMD APP SDK\3.0\lib\x86_64;$(LibraryPath)</LibraryPath>
     <ExecutablePath>C:\Program Files %28x86%29\AMD APP SDK\3.0\bin\x86_64;C:\Users\SlyFox\AMD APP SDK\3.0\lib\x86_64;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>C:\Program Files %28x86%29\AMD APP SDK\3.0\bin\x86_64;C:\Users\SlyFox\AMD APP SDK\3.0\lib\x86_64;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\Program Files %28x86%29\AMD APP SDK\3.0\include;C:\Users\SlyFox\AMD APP SDK\3.0\include\SDKUtil;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\AMD APP SDK\3.0\lib\x86_64;C:\Users\SlyFox\AMD APP SDK\3.0\lib\x86_64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
