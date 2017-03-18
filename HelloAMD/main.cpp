@@ -21,6 +21,19 @@ const char *program_source[] = {
 	"}\n"
 };
 
+bool check(cl_int result)
+{
+	switch (result)
+	{
+	case CL_SUCCESS:
+		return true;
+
+	default:
+		cout << "Not add some excemptions";
+		return false;
+	}
+}
+
 int main()
 {
 	cl_int result;
@@ -37,31 +50,31 @@ int main()
 		char buffer[10240];
 		for (cl_uint i(1); i < num + 1; i++)
 		{
-			if (clGetPlatformIDs(i, platform, NULL) == CL_SUCCESS)
+			if (check(clGetPlatformIDs(i, platform, NULL)))
 			{
 				cout << "handler of " << i << " platform succesfuly created" << endl;
 
-				if (clGetPlatformInfo(platform[i - 1], CL_PLATFORM_PROFILE, 10240, buffer, NULL) == CL_SUCCESS)
+				if (check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_PROFILE, 10240, buffer, NULL)))
 				{
 					cout << "Profile of " << i << " platform is " << buffer << endl;
 				};
 
-				if (clGetPlatformInfo(platform[i - 1], CL_PLATFORM_VERSION, 10240, buffer, NULL) == CL_SUCCESS)
+				if (check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_VERSION, 10240, buffer, NULL)))
 				{
 					cout << "Version of " << i << " platform is " << buffer << endl;
 				};
 
-				if (clGetPlatformInfo(platform[i - 1], CL_PLATFORM_NAME, 10240, buffer, NULL) == CL_SUCCESS)
+				if (check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_NAME, 10240, buffer, NULL)))
 				{
 					cout << "Name of " << i << " platform is " << buffer << endl;
 				};
 
-				if (clGetPlatformInfo(platform[i - 1], CL_PLATFORM_VENDOR, 10240, buffer, NULL) == CL_SUCCESS)
+				if (check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_VENDOR, 10240, buffer, NULL)))
 				{
 					cout << "Vendor of " << i << " platform is " << buffer << endl;
 				};
 
-				if (clGetPlatformInfo(platform[i - 1], CL_PLATFORM_EXTENSIONS, 10240, buffer, NULL) == CL_SUCCESS)
+				if (check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_EXTENSIONS, 10240, buffer, NULL)))
 				{
 					cout << "Extensions of " << i << " platform is " << buffer << endl;
 				};
@@ -70,7 +83,7 @@ int main()
 
 				cl_uint NumDevices = 0;
 
-				if (clGetDeviceIDs(platform[i - 1], CL_DEVICE_TYPE_ALL, NULL, NULL, &NumDevices) == CL_SUCCESS)
+				if (check(clGetDeviceIDs(platform[i - 1], CL_DEVICE_TYPE_ALL, NULL, NULL, &NumDevices)))
 				{
 					cout << "Count of devices on" << i << " platform succesfully find. There are " << NumDevices << " Devices" << endl;
 
@@ -79,12 +92,12 @@ int main()
 					for (cl_uint j(1); j < NumDevices+1; j++)
 					{
 
-						if (clGetDeviceIDs(platform[i - 1], CL_DEVICE_TYPE_ALL, j, devices, NULL) == CL_SUCCESS)
+						if (check(clGetDeviceIDs(platform[i - 1], CL_DEVICE_TYPE_ALL, j, devices, NULL)))
 						{
 							cout << "Handler of " << j << " device succesfuly created"<< endl;
 
 							cl_device_type* type = new cl_device_type;
-							if (clGetDeviceInfo(devices[j - 1], CL_DEVICE_TYPE, sizeof(type), type, NULL) == CL_SUCCESS)
+							if (check(clGetDeviceInfo(devices[j - 1], CL_DEVICE_TYPE, sizeof(type), type, NULL)))
 							{
 								if ((*type & CL_DEVICE_TYPE_CPU) != 0)
 								{
@@ -114,23 +127,23 @@ int main()
 							};
 
 							cl_uint buffer;
-							if (clGetDeviceInfo(devices[j - 1], CL_DEVICE_VENDOR_ID, sizeof(buffer), &buffer, NULL) == CL_SUCCESS)
+							if (check(clGetDeviceInfo(devices[j - 1], CL_DEVICE_VENDOR_ID, sizeof(buffer), &buffer, NULL)))
 							{
 								cout << "VendorID of " << j << " device is " << buffer << endl;
 							}
 
-							if (clGetDeviceInfo(devices[j - 1], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(buffer), &buffer, NULL) == CL_SUCCESS)
+							if (check(clGetDeviceInfo(devices[j - 1], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(buffer), &buffer, NULL)))
 							{
 								cout << "Max compute units of " << j << " device are " << buffer << endl;
 							}
 
-							if (clGetDeviceInfo(devices[j - 1], CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(buffer), &buffer, NULL) == CL_SUCCESS)
+							if (check(clGetDeviceInfo(devices[j - 1], CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(buffer), &buffer, NULL)))
 							{
 								cout << "Max work item dimention of " << j << " device are " << buffer << endl;
 
 								size_t* t = new size_t[buffer];
 
-								if (clGetDeviceInfo(devices[j - 1], CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t)*buffer, t, NULL) == CL_SUCCESS)
+								if (check(clGetDeviceInfo(devices[j - 1], CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t)*buffer, t, NULL)))
 								{
 									for (cl_uint f(0); f < buffer; f++)
 									{
@@ -141,13 +154,13 @@ int main()
 							
 							char name[256];
 
-							if (clGetDeviceInfo(devices[j - 1], CL_DEVICE_NAME , sizeof(char[256]), &name, NULL) == CL_SUCCESS)
+							if (check(clGetDeviceInfo(devices[j - 1], CL_DEVICE_NAME , sizeof(char[256]), &name, NULL)))
 							{
 								cout << "Name of " << j << " device are " << name << endl;
 							}
 							
 							size_t count;
-							if (clGetDeviceInfo(devices[j - 1], CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(count), &count, NULL) == CL_SUCCESS)
+							if (check(clGetDeviceInfo(devices[j - 1], CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(count), &count, NULL)))
 							{
 								cout << "Max count of work group of " << j << " device are " << count << endl;
 							}
