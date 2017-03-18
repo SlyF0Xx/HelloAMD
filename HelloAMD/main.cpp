@@ -34,6 +34,114 @@ bool check(cl_int result)
 	}
 }
 
+struct Dev
+{
+	cl_device_id* devices;
+	cl_uint NumDevices;
+};
+
+Dev CreateDevices(unsigned int size, cl_platform_id* platforms)
+{
+	cl_uint NumDevices = 0;
+	for (cl_uint i(0); i < size; i++)
+	{
+		if (check(clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, NULL, NULL, &NumDevices)))
+		{
+			cout << "Count of devices on" << i + 1 << " platform succesfully find. There are " << NumDevices << " Devices" << endl;
+
+			cl_device_id* devices = new cl_device_id[NumDevices];
+
+			if (check(clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, NULL, NULL, &NumDevices)))
+			{
+				cout << "Count of devices on" << i + 1 << " platform succesfully find. There are " << NumDevices << " Devices" << endl;
+
+				if (check(clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, NumDevices, devices, NULL)))
+				{
+					for (cl_uint j(0); j < NumDevices; j++)
+					{
+						cout << "Handler of " << j+1 << " device succesfuly created" << endl;
+
+						cl_device_type* type = new cl_device_type;
+						if (check(clGetDeviceInfo(devices[j], CL_DEVICE_TYPE, sizeof(type), type, NULL)))
+						{
+							if ((*type & CL_DEVICE_TYPE_CPU) != 0)
+							{
+								cout << "It's CPU!" << endl;
+							}
+							if ((*type & CL_DEVICE_TYPE_GPU) != 0)
+							{
+								cout << "It's GPU!" << endl;
+							}
+							if ((*type & CL_DEVICE_TYPE_ACCELERATOR) != 0)
+							{
+								cout << "It's Accelerator!" << endl;
+							}
+							if ((*type & CL_DEVICE_TYPE_CUSTOM) != 0)
+							{
+								cout << "It's Custom!" << endl;
+							}
+							if ((*type & CL_DEVICE_TYPE_DEFAULT) != 0)
+							{
+								cout << "It's default!" << endl;
+							}
+						};
+
+						cl_uint buffer;
+						if (check(clGetDeviceInfo(devices[j], CL_DEVICE_VENDOR_ID, sizeof(buffer), &buffer, NULL)))
+						{
+							cout << "VendorID of " << j + 1 << " device is " << buffer << endl;
+						}
+
+						if (check(clGetDeviceInfo(devices[j], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(buffer), &buffer, NULL)))
+						{
+							cout << "Max compute units of " << j + 1 << " device are " << buffer << endl;
+						}
+
+						if (check(clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(buffer), &buffer, NULL)))
+						{
+							cout << "Max work item dimention of " << j + 1 << " device are " << buffer << endl;
+
+							size_t* t = new size_t[buffer];
+
+							if (check(clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t)*buffer, t, NULL)))
+							{
+								for (cl_uint f(0); f < buffer; f++)
+								{
+									cout << "Max work item of " << j + 1 << " device in " << f + 1 << " dimention are " << t[f] << endl;
+								}
+							}
+						}
+
+						char name[256];
+
+						if (check(clGetDeviceInfo(devices[j], CL_DEVICE_NAME, sizeof(char[256]), &name, NULL)))
+						{
+							cout << "Name of " << j + 1 << " device are " << name << endl;
+						}
+
+						size_t count;
+						if (check(clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(count), &count, NULL)))
+						{
+							cout << "Max count of work group of " << j + 1 << " device are " << count << endl;
+						}
+
+						//TODO: описать и другие(можно и все описания)
+
+						cout << endl;
+					}
+				}
+			}
+
+			return Dev{devices, NumDevices};
+		}
+	}
+}
+
+Dev Initial()
+{
+
+}
+
 int main()
 {
 	cl_int result;
@@ -81,98 +189,7 @@ int main()
 
 				cout << endl;
 
-				cl_uint NumDevices = 0;
-
-				if (check(clGetDeviceIDs(platform[i - 1], CL_DEVICE_TYPE_ALL, NULL, NULL, &NumDevices)))
-				{
-					cout << "Count of devices on" << i << " platform succesfully find. There are " << NumDevices << " Devices" << endl;
-
-					cl_device_id* devices = new cl_device_id[NumDevices];
-
-					for (cl_uint j(1); j < NumDevices+1; j++)
-					{
-
-						if (check(clGetDeviceIDs(platform[i - 1], CL_DEVICE_TYPE_ALL, j, devices, NULL)))
-						{
-							cout << "Handler of " << j << " device succesfuly created"<< endl;
-
-							cl_device_type* type = new cl_device_type;
-							if (check(clGetDeviceInfo(devices[j - 1], CL_DEVICE_TYPE, sizeof(type), type, NULL)))
-							{
-								if ((*type & CL_DEVICE_TYPE_CPU) != 0)
-								{
-									cout << "It's CPU!" << endl;
-								}
-								if ((*type & CL_DEVICE_TYPE_GPU) != 0)
-								{
-									if (j == 2) //Это костыль. Думаю, стоит ли использовать сразу несколько видеокарт
-									{
-										AvaliableDevices.push_back(devices[j - 1]);
-									}
-
-									cout << "It's GPU!" << endl;
-								}
-								if ((*type & CL_DEVICE_TYPE_ACCELERATOR) != 0)
-								{
-									cout << "It's Accelerator!" << endl;
-								}
-								if ((*type & CL_DEVICE_TYPE_CUSTOM) != 0)
-								{
-									cout << "It's Custom!" << endl;
-								}
-								if ((*type & CL_DEVICE_TYPE_DEFAULT) != 0)
-								{
-									cout << "It's default!" << endl;
-								}
-							};
-
-							cl_uint buffer;
-							if (check(clGetDeviceInfo(devices[j - 1], CL_DEVICE_VENDOR_ID, sizeof(buffer), &buffer, NULL)))
-							{
-								cout << "VendorID of " << j << " device is " << buffer << endl;
-							}
-
-							if (check(clGetDeviceInfo(devices[j - 1], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(buffer), &buffer, NULL)))
-							{
-								cout << "Max compute units of " << j << " device are " << buffer << endl;
-							}
-
-							if (check(clGetDeviceInfo(devices[j - 1], CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(buffer), &buffer, NULL)))
-							{
-								cout << "Max work item dimention of " << j << " device are " << buffer << endl;
-
-								size_t* t = new size_t[buffer];
-
-								if (check(clGetDeviceInfo(devices[j - 1], CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t)*buffer, t, NULL)))
-								{
-									for (cl_uint f(0); f < buffer; f++)
-									{
-										cout << "Max work item of " << j << " device in " << f+1 << " dimention are " << t[f] << endl;
-									}
-								}
-							}
-							
-							char name[256];
-
-							if (check(clGetDeviceInfo(devices[j - 1], CL_DEVICE_NAME , sizeof(char[256]), &name, NULL)))
-							{
-								cout << "Name of " << j << " device are " << name << endl;
-							}
-							
-							size_t count;
-							if (check(clGetDeviceInfo(devices[j - 1], CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(count), &count, NULL)))
-							{
-								cout << "Max count of work group of " << j << " device are " << count << endl;
-							}
-							
-							//TODO: описать и другие(можно и все описания)
-
-							cout << endl;
-						}
-					}
-
-					delete[] devices;
-				}
+				Dev devices = CreateDevices(num, platform);
 			};
 		}
 
