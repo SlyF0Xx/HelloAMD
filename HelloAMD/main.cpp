@@ -21,16 +21,18 @@ const char *program_source[] = {
 	"}\n"
 };
 
-bool check(cl_int result)
+void check(cl_int result)
 {
 	switch (result)
 	{
 	case CL_SUCCESS:
-		return true;
+	{
+		return;
+	}
 
 	default:
 		cout << "Not add some excemptions";
-		return false;
+		exit(0);
 	}
 }
 
@@ -45,95 +47,85 @@ Dev CreateDevices(unsigned int size, cl_platform_id* platforms)
 	cl_uint NumDevices = 0;
 	for (cl_uint i(0); i < size; i++)
 	{
-		if (check(clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, NULL, NULL, &NumDevices)))
+		check(clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, NULL, NULL, &NumDevices));
+		cout << "Count of devices on" << i + 1 << " platform succesfully find. There are " << NumDevices << " Devices" << endl;
+
+		cl_device_id* devices = new cl_device_id[NumDevices];
+
+		check(clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, NULL, NULL, &NumDevices));
+		cout << "Count of devices on" << i + 1 << " platform succesfully find. There are " << NumDevices << " Devices" << endl;
+
+		check(clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, NumDevices, devices, NULL));
+		for (cl_uint j(0); j < NumDevices; j++)
 		{
-			cout << "Count of devices on" << i + 1 << " platform succesfully find. There are " << NumDevices << " Devices" << endl;
+			cout << "Handler of " << j + 1 << " device succesfuly created" << endl;
 
-			cl_device_id* devices = new cl_device_id[NumDevices];
-
-			if (check(clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, NULL, NULL, &NumDevices)))
+			cl_device_type* type = new cl_device_type;
+			check(clGetDeviceInfo(devices[j], CL_DEVICE_TYPE, sizeof(type), type, NULL));
+			if ((*type & CL_DEVICE_TYPE_CPU) != 0)
 			{
-				cout << "Count of devices on" << i + 1 << " platform succesfully find. There are " << NumDevices << " Devices" << endl;
-
-				if (check(clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, NumDevices, devices, NULL)))
-				{
-					for (cl_uint j(0); j < NumDevices; j++)
-					{
-						cout << "Handler of " << j+1 << " device succesfuly created" << endl;
-
-						cl_device_type* type = new cl_device_type;
-						if (check(clGetDeviceInfo(devices[j], CL_DEVICE_TYPE, sizeof(type), type, NULL)))
-						{
-							if ((*type & CL_DEVICE_TYPE_CPU) != 0)
-							{
-								cout << "It's CPU!" << endl;
-							}
-							if ((*type & CL_DEVICE_TYPE_GPU) != 0)
-							{
-								cout << "It's GPU!" << endl;
-							}
-							if ((*type & CL_DEVICE_TYPE_ACCELERATOR) != 0)
-							{
-								cout << "It's Accelerator!" << endl;
-							}
-							if ((*type & CL_DEVICE_TYPE_CUSTOM) != 0)
-							{
-								cout << "It's Custom!" << endl;
-							}
-							if ((*type & CL_DEVICE_TYPE_DEFAULT) != 0)
-							{
-								cout << "It's default!" << endl;
-							}
-						};
-
-						cl_uint buffer;
-						if (check(clGetDeviceInfo(devices[j], CL_DEVICE_VENDOR_ID, sizeof(buffer), &buffer, NULL)))
-						{
-							cout << "VendorID of " << j + 1 << " device is " << buffer << endl;
-						}
-
-						if (check(clGetDeviceInfo(devices[j], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(buffer), &buffer, NULL)))
-						{
-							cout << "Max compute units of " << j + 1 << " device are " << buffer << endl;
-						}
-
-						if (check(clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(buffer), &buffer, NULL)))
-						{
-							cout << "Max work item dimention of " << j + 1 << " device are " << buffer << endl;
-
-							size_t* t = new size_t[buffer];
-
-							if (check(clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t)*buffer, t, NULL)))
-							{
-								for (cl_uint f(0); f < buffer; f++)
-								{
-									cout << "Max work item of " << j + 1 << " device in " << f + 1 << " dimention are " << t[f] << endl;
-								}
-							}
-						}
-
-						char name[256];
-
-						if (check(clGetDeviceInfo(devices[j], CL_DEVICE_NAME, sizeof(char[256]), &name, NULL)))
-						{
-							cout << "Name of " << j + 1 << " device are " << name << endl;
-						}
-
-						size_t count;
-						if (check(clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(count), &count, NULL)))
-						{
-							cout << "Max count of work group of " << j + 1 << " device are " << count << endl;
-						}
-
-						//TODO: описать и другие(можно и все описания)
-
-						cout << endl;
-					}
-				}
+				cout << "It's CPU!" << endl;
+			}
+			if ((*type & CL_DEVICE_TYPE_GPU) != 0)
+			{
+				cout << "It's GPU!" << endl;
+			}
+			if ((*type & CL_DEVICE_TYPE_ACCELERATOR) != 0)
+			{
+				cout << "It's Accelerator!" << endl;
+			}
+			if ((*type & CL_DEVICE_TYPE_CUSTOM) != 0)
+			{
+				cout << "It's Custom!" << endl;
+			}
+			if ((*type & CL_DEVICE_TYPE_DEFAULT) != 0)
+			{
+				cout << "It's default!" << endl;
+			}
+			cl_uint buffer;
+			
+			check(clGetDeviceInfo(devices[j], CL_DEVICE_VENDOR_ID, sizeof(buffer), &buffer, NULL));
+			{
+				cout << "VendorID of " << j + 1 << " device is " << buffer << endl; 
 			}
 
-			return Dev{devices, NumDevices};
+			check(clGetDeviceInfo(devices[j], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(buffer), &buffer, NULL));
+			{
+				cout << "Max compute units of " << j + 1 << " device are " << buffer << endl; 
+			}
+
+			check(clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(buffer), &buffer, NULL));
+			{
+				cout << "Max work item dimention of " << j + 1 << " device are " << buffer << endl;
+
+				size_t* t = new size_t[buffer];
+
+				check(clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t)*buffer, t, NULL));
+				for (cl_uint f(0); f < buffer; f++)
+				{
+					cout << "Max work item of " << j + 1 << " device in " << f + 1 << " dimention are " << t[f] << endl;
+				}
+			}
+					
+			char name[256];
+
+			check(clGetDeviceInfo(devices[j], CL_DEVICE_NAME, sizeof(char[256]), &name, NULL));
+			{
+				cout << "Name of " << j + 1 << " device are " << name << endl;
+			}
+
+			size_t count;
+			check(clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(count), &count, NULL));
+			{
+				cout << "Max count of work group of " << j + 1 << " device are " << count << endl;
+			}
+
+			//TODO: описать и другие(можно и все описания)
+
+			cout << endl;
 		}
+
+		return Dev{ devices, NumDevices };
 	}
 }
 
@@ -158,39 +150,37 @@ int main()
 		char buffer[10240];
 		for (cl_uint i(1); i < num + 1; i++)
 		{
-			if (check(clGetPlatformIDs(i, platform, NULL)))
+			check(clGetPlatformIDs(i, platform, NULL));
+			cout << "handler of " << i << " platform succesfuly created" << endl;
+
+			check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_PROFILE, 10240, buffer, NULL));
 			{
-				cout << "handler of " << i << " platform succesfuly created" << endl;
-
-				if (check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_PROFILE, 10240, buffer, NULL)))
-				{
-					cout << "Profile of " << i << " platform is " << buffer << endl;
-				};
-
-				if (check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_VERSION, 10240, buffer, NULL)))
-				{
-					cout << "Version of " << i << " platform is " << buffer << endl;
-				};
-
-				if (check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_NAME, 10240, buffer, NULL)))
-				{
-					cout << "Name of " << i << " platform is " << buffer << endl;
-				};
-
-				if (check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_VENDOR, 10240, buffer, NULL)))
-				{
-					cout << "Vendor of " << i << " platform is " << buffer << endl;
-				};
-
-				if (check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_EXTENSIONS, 10240, buffer, NULL)))
-				{
-					cout << "Extensions of " << i << " platform is " << buffer << endl;
-				};
-
-				cout << endl;
-
-				Dev devices = CreateDevices(num, platform);
+				cout << "Profile of " << i << " platform is " << buffer << endl;
 			};
+
+			check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_VERSION, 10240, buffer, NULL));
+			{
+				cout << "Version of " << i << " platform is " << buffer << endl;
+			};
+
+			check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_NAME, 10240, buffer, NULL)));
+			{
+				cout << "Name of " << i << " platform is " << buffer << endl;
+			};
+
+			check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_VENDOR, 10240, buffer, NULL)));
+			{
+				cout << "Vendor of " << i << " platform is " << buffer << endl;
+			};
+
+			check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_EXTENSIONS, 10240, buffer, NULL));
+			{
+				cout << "Extensions of " << i << " platform is " << buffer << endl;
+			};
+
+			cout << endl;
+
+			Dev devices = CreateDevices(num, platform);
 		}
 
 		vector<cl_context_properties> ContextPropetries;
