@@ -2,7 +2,7 @@
 #include <CL\cl.h>
 #include <CL\cl2.hpp>
 #include <iostream>
-#include <CLUtil.hpp>
+//#include <CLUtil.hpp>
 
 #include <string>
 
@@ -156,6 +156,98 @@ void PlatformInfo(vector<cl::Platform> *Platforms)
 	}
 }
 
+void DeviceInfo(vector<vector<cl::Device>> *Devices)
+{
+	cout << "Devices created perfectly" << endl;
+	/*for (int i(0); i < Devices->size(); i++)
+	{
+		cout << "There are " << (*Devices)[i].size() << " for this platorm" << endl;
+		DeviceInfo(&((*Devices)[i]));
+	}*/
+	/*
+	for (auto i : (*Devices))
+	{
+		cout << "There are "<< i.size()<<" for this platorm"<<endl;
+		
+		DeviceInfo(&i);
+	}*/
+}
+
+void DeviceInfo(vector<cl::Device> *Devices)
+{
+	cout << "Devices created perfectly" << endl;
+	
+	for (auto j : *Devices)
+	{
+		char name[256];
+
+		check(j.getInfo(CL_DEVICE_NAME, &name));
+		{
+			cout << "Name of device are " << name << endl;
+		}
+
+		cl_device_type* type = new cl_device_type;
+		check(j.getInfo(CL_DEVICE_TYPE, type));
+		if ((*type & CL_DEVICE_TYPE_CPU) != 0)
+		{
+			cout << "It's CPU!" << endl;
+		}
+		if ((*type & CL_DEVICE_TYPE_GPU) != 0)
+		{
+			cout << "It's GPU!" << endl;
+		}
+		if ((*type & CL_DEVICE_TYPE_ACCELERATOR) != 0)
+		{
+			cout << "It's Accelerator!" << endl;
+		}
+		if ((*type & CL_DEVICE_TYPE_CUSTOM) != 0)
+		{
+			cout << "It's Custom!" << endl;
+		}
+		if ((*type & CL_DEVICE_TYPE_DEFAULT) != 0)
+		{
+			cout << "It's default!" << endl;
+		}
+		cl_uint buffer;
+
+		check(j.getInfo(CL_DEVICE_VENDOR_ID, &buffer));
+		{
+			cout << "VendorID of device is " << buffer << endl;
+		}
+
+		check(j.getInfo(CL_DEVICE_MAX_COMPUTE_UNITS, &buffer));
+		{
+			cout << "Max compute units of device are " << buffer << endl;
+		}
+
+		check(j.getInfo(CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, &buffer));
+		{
+			cout << "Max work item dimention of device are " << buffer << endl;
+			vector<size_t> t;
+
+			check(j.getInfo(CL_DEVICE_MAX_WORK_ITEM_SIZES, &t));
+			for (cl_uint f(0); f < buffer; f++)
+			{
+				cout << "Max work item of device in " << f + 1 << " dimention are " << t[f] << endl;
+			}
+
+		}
+
+
+		size_t count;
+		check(j.getInfo(CL_DEVICE_MAX_WORK_GROUP_SIZE, &count));
+		{
+			cout << "Max count of work group of device are " << count << endl;
+		}
+
+		//TODO: описать и другие(можно и все описания)
+
+		cout << endl;
+
+	}
+}
+
+
 int main()
 {
 	vector<cl::Platform> Platforms;
@@ -166,6 +258,18 @@ int main()
 		PlatformInfo(&Platforms);
 	}
 	
+	vector<vector<cl::Device>> Devices;
+
+	Devices.resize(Platforms.size());
+	for (int i(0); i < Platforms.size(); i++)
+	{
+		check(Platforms[i].getDevices(CL_DEVICE_TYPE_ALL, &(Devices[i])));
+		if (_DEBUG)
+		{
+			DeviceInfo(&(Devices[i]));
+		}
+	}
+
 
 	cl_int result;
 	cl_uint num = 0;
