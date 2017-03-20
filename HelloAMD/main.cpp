@@ -1,5 +1,8 @@
 #include <vector>
+
 #include <CL\cl.h>
+
+#include <CL\cl2.hpp>
 #include <iostream>
 #include <CLUtil.hpp>
 
@@ -129,13 +132,14 @@ Dev CreateDevices(unsigned int size, cl_platform_id* platforms)
 	}
 }
 
-Dev Initial()
-{
-
-}
 
 int main()
 {
+	vector<cl::Platform> Platforms;
+	check(cl::Platform::get(&Platforms));
+
+
+
 	cl_int result;
 	cl_uint num = 0;
 
@@ -163,12 +167,12 @@ int main()
 				cout << "Version of " << i << " platform is " << buffer << endl;
 			};
 
-			check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_NAME, 10240, buffer, NULL)));
+			check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_NAME, 10240, buffer, NULL));
 			{
 				cout << "Name of " << i << " platform is " << buffer << endl;
 			};
 
-			check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_VENDOR, 10240, buffer, NULL)));
+			check(clGetPlatformInfo(platform[i - 1], CL_PLATFORM_VENDOR, 10240, buffer, NULL)	);
 			{
 				cout << "Vendor of " << i << " platform is " << buffer << endl;
 			};
