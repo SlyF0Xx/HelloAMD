@@ -1,10 +1,10 @@
 #include <vector>
-
 #include <CL\cl.h>
-
 #include <CL\cl2.hpp>
 #include <iostream>
 #include <CLUtil.hpp>
+
+#include <string>
 
 #pragma comment(lib, "OpenCL.lib")
 
@@ -132,13 +132,40 @@ Dev CreateDevices(unsigned int size, cl_platform_id* platforms)
 	}
 }
 
+void PlatformInfo(vector<cl::Platform> *Platforms)
+{
+	cout << "Platforms created perfectly. There are "<<Platforms->size()<<" platforms"<<endl;
+	std::string str = std::string();
+	for (auto i : (*Platforms))
+	{
+		check(i.getInfo(CL_PLATFORM_NAME, &str));
+		cout << "Information about "<< str <<" platform" << endl;
+
+		check(i.getInfo(CL_PLATFORM_EXTENSIONS, &str));
+		cout << "These platform have these extensions: "<<str<<endl;
+		
+		check(i.getInfo(CL_PLATFORM_PROFILE, &str));
+		cout << "These platform have these profile: " << str << endl;
+
+		check(i.getInfo(CL_PLATFORM_VENDOR, &str));
+		cout << "These platform have these vendor: " << str << endl;
+
+		check(i.getInfo(CL_PLATFORM_VERSION, &str));
+		cout << "These platform have these version: " << str << endl;
+		cout << endl;
+	}
+}
 
 int main()
 {
 	vector<cl::Platform> Platforms;
 	check(cl::Platform::get(&Platforms));
-
-
+	
+	if (_DEBUG)
+	{
+		PlatformInfo(&Platforms);
+	}
+	
 
 	cl_int result;
 	cl_uint num = 0;
