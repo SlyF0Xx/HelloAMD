@@ -24,6 +24,15 @@ const char *program_source[] = {
 	"}\n"
 };
 
+const vector<string> source = {
+	"__kernel void simple(__global write_only int *Dst, const  int Wide)\n",
+	"{\n",
+	"	int x = get_global_id(0);\n",
+	"   int y = get_global_id(1);\n",
+	"	Dst[y*Wide+x] = y*Wide+x;\n",
+	"}\n"
+};
+
 void check(cl_int result)
 {
 	switch (result)
@@ -280,18 +289,57 @@ int main()
 
 	vector<cl_context_properties> ContextPropetries;
 
-	if (Platforms.size() == 1)
+
+	vector<vector<cl::CommandQueue>> CommandQueues;
+
 	{
-		ContextPropetries.push_back(CL_CONTEXT_PLATFORM);
-		ContextPropetries.push_back((cl_context_properties)Platforms[0]());
+		ContextPropetries.clear();
+		if (Platforms.size() == 1)
+		{
+			ContextPropetries.push_back(CL_CONTEXT_PLATFORM);
+			ContextPropetries.push_back((cl_context_properties)Platforms[0]());
+		}
+
+		ContextPropetries.push_back(0);
+
+		Contexts.push_back(cl::Context(Avaliable, ContextPropetries.data(), pfn_notify, &result));
+		check(result);
+
+		if (_DEBUG)
+		{
+			//TODO: Описание контекста 
+		}
+
+
+		cl::QueueProperties Prop(cl::QueueProperties::None);
+
+		if (_DEBUG)
+		{
+			Prop = Prop | (cl::QueueProperties)CL_QUEUE_PROFILING_ENABLE;
+			//CommandQueuePropetries |= CL_QUEUE_PROFILING_ENABLE;
+		}
+
+		CommandQueues.push_back(vector<cl::CommandQueue>());
+		CommandQueues.back().push_back(cl::CommandQueue(Contexts[0], Avaliable[0], Prop, &result));
+
+		check(result);
+
+		if (_DEBUG)
+		{
+			//TODO описание очередей
+		}
 	}
 
-	ContextPropetries.push_back(0);
 
-	Contexts.push_back(cl::Context(Avaliable, ContextPropetries.data(), pfn_notify, &result));
-	check(result);
+	cl::Program::Sources sources = cl::Program::Sources(source);
+	cl::Program prog = cl::Program(Contexts[0], sources, &result);
+	prog.build(); //TODO опции!!
 
-	//TODO: Описание контекста 
+	if (_DEBUG)
+	{
+		//TODO описание программы
+	}
+
 
 
 	cl_uint num = 0;
