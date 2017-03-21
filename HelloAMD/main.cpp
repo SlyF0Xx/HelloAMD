@@ -250,17 +250,22 @@ void DeviceInfo(vector<cl::Device> *Devices)
 
 int main()
 {
+	cl_int result(0);
+
 	vector<cl::Platform> Platforms;
 	check(cl::Platform::get(&Platforms));
-	
+
 	if (_DEBUG)
 	{
 		PlatformInfo(&Platforms);
 	}
-	
+
 	vector<vector<cl::Device>> Devices;
 
 	Devices.resize(Platforms.size());
+
+	vector<cl::Device> Avaliable;
+
 	for (int i(0); i < Platforms.size(); i++)
 	{
 		check(Platforms[i].getDevices(CL_DEVICE_TYPE_ALL, &(Devices[i])));
@@ -268,10 +273,27 @@ int main()
 		{
 			DeviceInfo(&(Devices[i]));
 		}
+		Avaliable.insert(Avaliable.end(), Devices[i].begin(), Devices[i].end());
 	}
 
+	vector<cl::Context> Contexts;
 
-	cl_int result;
+	vector<cl_context_properties> ContextPropetries;
+
+	if (Platforms.size() == 1)
+	{
+		ContextPropetries.push_back(CL_CONTEXT_PLATFORM);
+		ContextPropetries.push_back((cl_context_properties)Platforms[0]());
+	}
+
+	ContextPropetries.push_back(0);
+
+	Contexts.push_back(cl::Context(Avaliable, ContextPropetries.data(), pfn_notify, &result));
+	check(result);
+
+	//TODO: Описание контекста 
+
+
 	cl_uint num = 0;
 
 	if (clGetPlatformIDs(NULL, nullptr, &num) == CL_SUCCESS)
