@@ -262,6 +262,9 @@ int main()
 	cl_int result(0);
 
 	vector<cl::Platform> Platforms;
+
+	//PREINITIAL BEGIN
+
 	check(cl::Platform::get(&Platforms));
 
 	if (_DEBUG)
@@ -285,14 +288,12 @@ int main()
 		Avaliable.insert(Avaliable.end(), Devices[i].begin(), Devices[i].end());
 	}
 
-	vector<cl::Context> Contexts;
-
-	vector<cl_context_properties> ContextPropetries;
-
-
-	vector<vector<cl::CommandQueue>> CommandQueues;
-
+	//PREINITIAL END
+	
 	{
+		//INITIAL BEGIN
+
+		vector<cl_context_properties> ContextPropetries;
 		ContextPropetries.clear();
 		if (Platforms.size() == 1)
 		{
@@ -302,7 +303,7 @@ int main()
 
 		ContextPropetries.push_back(0);
 
-		Contexts.push_back(cl::Context(Avaliable, ContextPropetries.data(), pfn_notify, &result));
+		cl::Context Context = cl::Context(Avaliable, ContextPropetries.data(), pfn_notify, &result);
 		check(result);
 
 		if (_DEBUG)
@@ -319,8 +320,7 @@ int main()
 			//CommandQueuePropetries |= CL_QUEUE_PROFILING_ENABLE;
 		}
 
-		CommandQueues.push_back(vector<cl::CommandQueue>());
-		CommandQueues.back().push_back(cl::CommandQueue(Contexts[0], Avaliable[0], Prop, &result));
+		cl::CommandQueue CommandQueues = cl::CommandQueue(Context, Avaliable[0], Prop, &result);
 
 		check(result);
 
@@ -328,17 +328,44 @@ int main()
 		{
 			//TODO описание очередей
 		}
+
+
+		cl::Program::Sources sources = cl::Program::Sources(source);
+		cl::Program progs = cl::Program(Context, sources, &result);
+		progs.build(); //TODO опции!!
+
+		if (_DEBUG)
+		{
+			//TODO описание программы
+		}
+
+
+		//INITIAL END
+
+		cl::Kernel Kernels = cl::Kernel(progs, "simple", &result);
+
+		check(result);
+
+		if (_DEBUG)
+		{
+			//TODO описание Кернела, аргументов и проч.
+		}
+
+		const int Wide = 16384;
+
+		unsigned int size = Wide * Wide * sizeof(int);
+		cl::Memory Memories = cl::Buffer(Context, CL_MEM_WRITE_ONLY, size, &result);
+
+
 	}
 
 
-	cl::Program::Sources sources = cl::Program::Sources(source);
-	cl::Program prog = cl::Program(Contexts[0], sources, &result);
-	prog.build(); //TODO опции!!
 
-	if (_DEBUG)
-	{
-		//TODO описание программы
-	}
+
+
+
+
+
 
 
 
