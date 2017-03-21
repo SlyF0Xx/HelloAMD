@@ -41,7 +41,41 @@ void check(cl_int result)
 	{
 		return;
 	}
-
+	case CL_INVALID_KERNEL:
+	{
+		cout << "Kernel Invalid";
+		exit(0);
+	}
+	case CL_INVALID_ARG_INDEX:
+	{
+		cout << "Index Arg Invalid";
+		exit(0);
+	}
+	case CL_INVALID_ARG_VALUE:
+	{
+		cout << "Value Arg Invalid";
+		exit(0);
+	}
+	case CL_INVALID_MEM_OBJECT:
+	{
+		cout << "Memory Invalid";
+		exit(0);
+	}
+	case CL_INVALID_SAMPLER:
+	{
+		cout << "Sempler Invalid";
+		exit(0);
+	}
+	case CL_INVALID_DEVICE_QUEUE:
+	{
+		cout << "Device Queue Invalid";
+		exit(0);
+	}
+	case CL_INVALID_ARG_SIZE:
+	{
+		cout << "Arg Invalid";
+		exit(0);
+	}
 	default:
 		cout << "Not add some excemptions";
 		exit(0);
@@ -316,11 +350,11 @@ int main()
 
 		if (_DEBUG)
 		{
-			Prop = Prop | (cl::QueueProperties)CL_QUEUE_PROFILING_ENABLE;
+			//Prop = Prop | (cl::QueueProperties)CL_QUEUE_PROFILING_ENABLE;
 			//CommandQueuePropetries |= CL_QUEUE_PROFILING_ENABLE;
 		}
 
-		cl::CommandQueue CommandQueues = cl::CommandQueue(Context, Avaliable[0], Prop, &result);
+		cl::CommandQueue CommandQueue = cl::CommandQueue(Context, Avaliable[0], Prop, &result);
 
 		check(result);
 
@@ -331,8 +365,8 @@ int main()
 
 
 		cl::Program::Sources sources = cl::Program::Sources(source);
-		cl::Program progs = cl::Program(Context, sources, &result);
-		progs.build(); //TODO опции!!
+		cl::Program prog = cl::Program(Context, sources, &result);
+		prog.build(); //TODO опции!!
 
 		if (_DEBUG)
 		{
@@ -342,7 +376,7 @@ int main()
 
 		//INITIAL END
 
-		cl::Kernel Kernels = cl::Kernel(progs, "simple", &result);
+		cl::Kernel Kernel = cl::Kernel(prog, "simple", &result);
 
 		check(result);
 
@@ -354,13 +388,51 @@ int main()
 		const int Wide = 16384;
 
 		unsigned int size = Wide * Wide * sizeof(int);
-		cl::Memory Memories = cl::Buffer(Context, CL_MEM_WRITE_ONLY, size, &result);
 
+		int *Mem = nullptr;
+		cl::Buffer Memory = cl::Buffer(Context, CL_MEM_WRITE_ONLY, size, Mem, &result);
 
+		check(result);
+
+		//check(Kernel.setArg(0, &Memory));
+		check(Kernel.setArg(0, sizeof(cl_mem), &Memory));
+		check(Kernel.setArg(1, sizeof(int), &Wide));
+
+		cl::NDRange offset(0);
+		cl::NDRange global(Wide, Wide, 1);
+		cl::NDRange local(16, 16, 1);
+
+		check(CommandQueue.enqueueNDRangeKernel(Kernel, cl::NullRange, global, local, NULL, NULL));
+																				//event
+
+		check(CommandQueue.enqueueMarkerWithWaitList());
+											//event
+
+		cout << "Done!" << endl;
+
+		//int *dat = nullptr;
+		//check(CommandQueue.enqueueReadBuffer(Memory, true, 0, size, &dat, NULL, NULL));
+		//																				//events
+
+		int data = 0;
+		{
+			for (int i(0); i < Wide; i++)
+			{
+				for (int j(0); j < Wide; j++)
+				{
+					CommandQueue.enqueueReadBuffer(Memory, true, (i*Wide + j) * sizeof(int), sizeof(int), &data, NULL, NULL);
+					//result = clEnqueueReadBuffer(CommandQueue, Memory, true, i*Wide + j * sizeof(int), sizeof(int), &data, NULL, NULL, NULL);
+					cout << data << " ";
+					//cout << dat[i*Wide + j];
+					
+				}
+				cout << endl;
+			}
+		}
 	}
 
 
-
+	
 
 
 
