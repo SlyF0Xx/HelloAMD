@@ -86,6 +86,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <ExecutablePath>C:\Program Files %28x86%29\AMD APP SDK\3.0\bin\x86_64;C:\Users\SlyFox\AMD APP SDK\3.0\lib\x86_64;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\Program Files %28x86%29\AMD APP SDK\3.0\include;C:\Users\SlyFox\AMD APP SDK\3.0\include\SDKUtil;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\AMD APP SDK\3.0\lib\x86_64;C:\Users\SlyFox\AMD APP SDK\3.0\lib\x86_64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

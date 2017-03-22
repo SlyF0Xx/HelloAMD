@@ -17,7 +17,7 @@ void CL_CALLBACK pfn_notify(const char *errinfo, const void *private_info, size_
 }
 
 const vector<string> source = {
-	"__kernel void simple(__global write_only int *Dst, const  int Wide)\n",
+	"__kernel void simple(__global write_only float *Dst, const  int Wide)\n",
 	"{\n",
 	"	int x = get_global_id(0);\n",
 	"   int y = get_global_id(1);\n",
@@ -190,17 +190,18 @@ void DeviceInfo(vector<cl::Device> *Devices)
 	}
 }
 
+typedef float type;
 
 int main()
 {
 	/*
 	ifstream fin("out-1.txt", ios::binary);
 	
-	int temp[257];
+	type temp[257];
 
 	for (int i(0); i < 257; i++)
 	{
-		fin.read((char *)(temp + i), 4);
+		fin.read((char *)(temp + i), sizeof(type));
 	}
 	*/
 
@@ -214,10 +215,9 @@ int main()
 
 	check(cl::Platform::get(&Platforms));
 
-	if (_DEBUG)
-	{
+	#ifdef _DEBUG
 		PlatformInfo(&Platforms);
-	}
+	#endif // DEBUG
 
 	vector<vector<cl::Device>> Devices;
 
@@ -228,10 +228,10 @@ int main()
 	for (int i(0); i < Platforms.size(); i++)
 	{
 		check(Platforms[i].getDevices(CL_DEVICE_TYPE_ALL, &(Devices[i])));
-		if (_DEBUG)
-		{
+		#ifdef _DEBUG
 			DeviceInfo(&(Devices[i]));
-		}
+		#endif // _DEBUG
+
 		Avaliable.insert(Avaliable.end(), Devices[i].begin(), Devices[i].end());
 	}
 
@@ -253,39 +253,34 @@ int main()
 		cl::Context Context = cl::Context(Avaliable, ContextPropetries.data(), pfn_notify, &result);
 		check(result);
 
-		if (_DEBUG)
-		{
+		#ifdef _DEBUG
 			//TODO: Описание контекста 
-		}
+		#endif
 
 
 		cl::QueueProperties Prop(cl::QueueProperties::None);
 
-		if (_DEBUG)
-		{
+		#ifdef _DEBUG
 			Prop = Prop | (cl::QueueProperties)CL_QUEUE_PROFILING_ENABLE;
 			//CommandQueuePropetries |= CL_QUEUE_PROFILING_ENABLE;
-		}
+		#endif // _DEBUG
 
 		cl::CommandQueue CommandQueue = cl::CommandQueue(Context, Avaliable[0], Prop, &result);
 
 		check(result);
 
-		if (_DEBUG)
-		{
+		#ifdef _DEBUG
 			//TODO описание очередей
-		}
+		#endif
 
 
 		cl::Program::Sources sources = cl::Program::Sources(source);
 		cl::Program prog = cl::Program(Context, sources, &result);
 		prog.build(); //TODO опции!!
 
-		if (_DEBUG)
-		{
+		#ifdef _DEBUG
 			//TODO описание программы
-		}
-
+		#endif // _DEBUG
 
 		//INITIAL END
 
@@ -293,14 +288,13 @@ int main()
 
 		check(result);
 
-		if (_DEBUG)
-		{
+		#ifdef _DEBUG
 			//TODO описание Кернела, аргументов и проч.
-		}
+		#endif // _DEBUG
 
 		const int Wide = 16384;
-
-		unsigned int size = Wide * Wide * sizeof(int);
+		
+		unsigned int size = Wide * Wide * sizeof(type);
 
 		int *Mem = nullptr;
 		cl::Buffer Memory = cl::Buffer(Context, CL_MEM_WRITE_ONLY, size, Mem, &result);
@@ -325,7 +319,7 @@ int main()
 
 		
 		const unsigned int BufferSize = 16384;
-		int Buffer[BufferSize];
+		type Buffer[BufferSize];
 
 		for (int i(0); i < Wide*Wide/BufferSize; i++)
 		{
