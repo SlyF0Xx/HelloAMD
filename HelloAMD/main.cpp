@@ -3,6 +3,7 @@
 #include <CL\cl2.hpp>
 #include <iostream>
 //#include <CLUtil.hpp>
+#include <fstream>
 
 #include <string>
 
@@ -192,6 +193,19 @@ void DeviceInfo(vector<cl::Device> *Devices)
 
 int main()
 {
+	/*
+	ifstream fin("out-1.txt", ios::binary);
+	
+	int temp[257];
+
+	for (int i(0); i < 257; i++)
+	{
+		fin.read((char *)(temp + i), 4);
+	}
+	*/
+
+	ofstream fout("out-1.txt", ios::binary);
+
 	cl_int result(0);
 
 	vector<cl::Platform> Platforms;
@@ -309,25 +323,75 @@ int main()
 
 		cout << "Done!" << endl;
 
-		//int *dat = nullptr;
-		//check(CommandQueue.enqueueReadBuffer(Memory, true, 0, size, &dat, NULL, NULL));
-		//																				//events
+		
+		const unsigned int BufferSize = 16384;
+		int Buffer[BufferSize];
 
+		for (int i(0); i < Wide*Wide/BufferSize; i++)
+		{
+			CommandQueue.enqueueReadBuffer(Memory, true, i*sizeof(Buffer), sizeof(Buffer), &Buffer, NULL, NULL);
+
+			fout.write((char *)&Buffer, sizeof(Buffer)/ sizeof(char));
+			fout.flush();
+		}
+		
+		/*
+		CommandQueue.enqueueReadBuffer(Memory, true, 0, sizeof(Buffer), &Buffer, NULL, NULL);
+		fout.write((char *)&Buffer, BufferSize * sizeof(int) / sizeof(char));
+		fout.flush();
+		*/
+
+		/*
+		string buf;
+
+		basic_filebuf<int> b;
+		b.open("out-3.txt", ios::ios_base::out | ios::ios_base::binary);
+
+		b.sputn(Buffer, sizeof(Buffer)-1);
+		b.close();
+		*/
+
+		/*
+		for (int i(0); i < BufferSize; i++)
+		{
+			fout << Buffer[i];
+		}
+		*/
+
+		/*
+		string temp;
+		string buf;
 		int data = 0;
 		{
 			for (int i(0); i < Wide; i++)
 			{
-				for (int j(0); j < Wide; j++)
+				CommandQueue.enqueueReadBuffer(Memory, true, i*(Wide / BufferSize) * sizeof(Buffer), sizeof(Buffer), &Buffer, NULL, NULL);
+				for (int k(0); k < BufferSize; k++)
 				{
-					CommandQueue.enqueueReadBuffer(Memory, true, (i*Wide + j) * sizeof(int), sizeof(int), &data, NULL, NULL);
-					//result = clEnqueueReadBuffer(CommandQueue, Memory, true, i*Wide + j * sizeof(int), sizeof(int), &data, NULL, NULL, NULL);
-					cout << data << " ";
-					//cout << dat[i*Wide + j];
-					
+					temp = std::to_string(Buffer[k]);
+					buf.insert(buf.end(), temp.begin(), temp.end());
+					buf.push_back(' ');
 				}
-				cout << endl;
+				fout << buf;
+				fout << endl;
+				buf.clear();
 			}
 		}
+		*/
+
+		/*
+		int data = 0;
+		{
+			for (int i(0); i < Wide; i++)
+			{
+				CommandQueue.enqueueReadBuffer(Memory, true, i*(Wide / BufferSize)* sizeof(Buffer), sizeof(Buffer), &Buffer, NULL, NULL);
+				for (int k(0); k < BufferSize; k++)
+				{
+					fout << Buffer[k] << " ";
+				}
+				fout << endl;
+			}
+		}*/
 	}
 
 
