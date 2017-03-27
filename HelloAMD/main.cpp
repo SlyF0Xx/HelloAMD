@@ -222,10 +222,10 @@ void DeviceInfo(vector<cl::Device> *Devices)
 typedef float type;
 const int Wide = 8192;//16384
 
-int main()
+void Reading(vector<string>* source, type* Src1Ptr, type* Src2Ptr)
 {
 	ifstream KernelFile("Sources.cl");
-	vector<string> source;
+	
 	string temp = string();
 
 	if (!KernelFile)
@@ -236,7 +236,7 @@ int main()
 
 	while (getline(KernelFile, temp))
 	{
-		source.push_back(temp);
+		source->push_back(temp);
 	}
 
 	KernelFile.close();
@@ -244,23 +244,29 @@ int main()
 	ifstream Src1File("in-1.txt", ios::binary);
 	ifstream Src2File("in-2.txt", ios::binary);
 
-	type Src1Ptr[Wide*Wide];
-	type Src2Ptr[Wide*Wide];
 
 	for (int i(0); i < Wide*Wide; i++)
 	{
 		Src1File.read((char *)(Src1Ptr + i), sizeof(type));
 		Src2File.read((char *)(Src2Ptr + i), sizeof(type));
 	}
-	
+
 	Src1File.close();
 	Src2File.close();
+}
+
+int main()
+{
+	vector<string> source;
+
+	type Src1Ptr[Wide*Wide];
+	type Src2Ptr[Wide*Wide];
+
+	Reading(&source, Src1Ptr, Src2Ptr);
 
 	ofstream fout("out-1.txt", ios::binary);
 
 	cl_int result(0);
-
-
 
 	vector<cl::Platform> Platforms;
 
@@ -374,7 +380,7 @@ int main()
 		cout << "Done!" << endl;
 
 		
-		const unsigned int BufferSize = 4096;//16384
+		const unsigned int BufferSize = 8192;//16384
 		type Buffer[BufferSize];
 
 		for (int i(0); i < Wide*Wide/BufferSize; i++)
