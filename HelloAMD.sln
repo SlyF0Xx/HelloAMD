@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HelloAMD", "HelloAMD\HelloAMD.vcxproj", "{19732DCC-48F3-4B19-B3B7-4A33CA6D9458}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.vcxproj", "{944C1DE8-D3EA-4FC8-B2F9-909D4596C839}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{19732DCC-48F3-4B19-B3B7-4A33CA6D9458}.Release|x64.Build.0 = Release|x64
 		{19732DCC-48F3-4B19-B3B7-4A33CA6D9458}.Release|x86.ActiveCfg = Release|Win32
 		{19732DCC-48F3-4B19-B3B7-4A33CA6D9458}.Release|x86.Build.0 = Release|Win32
+		{944C1DE8-D3EA-4FC8-B2F9-909D4596C839}.Debug|x64.ActiveCfg = Debug|x64
+		{944C1DE8-D3EA-4FC8-B2F9-909D4596C839}.Debug|x64.Build.0 = Debug|x64
+		{944C1DE8-D3EA-4FC8-B2F9-909D4596C839}.Debug|x86.ActiveCfg = Debug|Win32
+		{944C1DE8-D3EA-4FC8-B2F9-909D4596C839}.Debug|x86.Build.0 = Debug|Win32
+		{944C1DE8-D3EA-4FC8-B2F9-909D4596C839}.Release|x64.ActiveCfg = Release|x64
+		{944C1DE8-D3EA-4FC8-B2F9-909D4596C839}.Release|x64.Build.0 = Release|x64
+		{944C1DE8-D3EA-4FC8-B2F9-909D4596C839}.Release|x86.ActiveCfg = Release|Win32
+		{944C1DE8-D3EA-4FC8-B2F9-909D4596C839}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

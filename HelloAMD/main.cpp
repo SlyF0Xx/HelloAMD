@@ -16,15 +16,6 @@ void CL_CALLBACK pfn_notify(const char *errinfo, const void *private_info, size_
 	fprintf(stderr, "OpenCL Error (via pfn_notify): %s\n", errinfo);
 }
 
-const vector<string> source = {
-	"__kernel void simple(__global write_only float *Dst, const  int Wide)\n",
-	"{\n",
-	"	int x = get_global_id(0);\n",
-	"   int y = get_global_id(1);\n",
-	"	Dst[y*Wide+x] = y*Wide+x;\n",
-	"}\n"
-};
-
 void check(cl_int result)
 {
 	switch (result)
@@ -36,41 +27,66 @@ void check(cl_int result)
 	case CL_INVALID_KERNEL:
 	{
 		cout << "Kernel Invalid";
-		exit(0);
+		system("pause");
 	}
 	case CL_INVALID_ARG_INDEX:
 	{
 		cout << "Index Arg Invalid";
-		exit(0);
+		system("pause");
 	}
 	case CL_INVALID_ARG_VALUE:
 	{
 		cout << "Value Arg Invalid";
-		exit(0);
+		system("pause");
 	}
 	case CL_INVALID_MEM_OBJECT:
 	{
 		cout << "Memory Invalid";
-		exit(0);
+		system("pause");
 	}
 	case CL_INVALID_SAMPLER:
 	{
 		cout << "Sempler Invalid";
-		exit(0);
+		system("pause");
 	}
 	case CL_INVALID_DEVICE_QUEUE:
 	{
 		cout << "Device Queue Invalid";
-		exit(0);
+		system("pause");
 	}
 	case CL_INVALID_ARG_SIZE:
 	{
 		cout << "Arg Invalid";
-		exit(0);
+		system("pause");
+	}
+	case CL_OUT_OF_HOST_MEMORY:
+	{
+		cout << "Out of host memory";
+		system("pause");
+	}
+	case CL_INVALID_VALUE:
+	{
+		cout << "Invalid value";
+		system("pause");
+	}
+	case CL_INVALID_CONTEXT:
+	{
+		cout << "Invalid context";
+		system("pause");
+	}
+	case CL_INVALID_COMMAND_QUEUE:
+	{
+		cout << "Invalid command Queue";
+		system("pause");
+	}
+	case CL_MEM_OBJECT_ALLOCATION_FAILURE:
+	{
+		cout << "Allocation memory failed";
+		system("pause");
 	}
 	default:
 		cout << "Not add some excemptions";
-		exit(0);
+		system("pause");
 	}
 }
 
@@ -183,6 +199,19 @@ void DeviceInfo(vector<cl::Device> *Devices)
 			cout << "Max count of work group of device are " << count << endl;
 		}
 
+		cl_device_local_mem_type mem;
+		check(j.getInfo(CL_DEVICE_LOCAL_MEM_TYPE, &mem));
+		{
+			cout << "Local mem type of device is " << (mem==CL_LOCAL ? "local" : "global") << endl;
+		}
+		
+
+		cl_ulong lon;
+		check(j.getInfo(CL_DEVICE_LOCAL_MEM_SIZE, &lon));
+		{
+			cout << "Max local memory of device are " << lon << endl;
+		}
+
 		//TODO: описать и другие(можно и все описания)
 
 		cout << endl;
@@ -191,23 +220,47 @@ void DeviceInfo(vector<cl::Device> *Devices)
 }
 
 typedef float type;
+const int Wide = 8192;//16384
 
 int main()
 {
-	/*
-	ifstream fin("out-1.txt", ios::binary);
-	
-	type temp[257];
+	ifstream KernelFile("Sources.cl");
+	vector<string> source;
+	string temp = string();
 
-	for (int i(0); i < 257; i++)
+	if (!KernelFile)
 	{
-		fin.read((char *)(temp + i), sizeof(type));
+		cout << "Файл не найден";
+		system("pause");
 	}
-	*/
+
+	while (getline(KernelFile, temp))
+	{
+		source.push_back(temp);
+	}
+
+	KernelFile.close();
+
+	ifstream Src1File("in-1.txt", ios::binary);
+	ifstream Src2File("in-2.txt", ios::binary);
+
+	type Src1Ptr[Wide*Wide];
+	type Src2Ptr[Wide*Wide];
+
+	for (int i(0); i < Wide*Wide; i++)
+	{
+		Src1File.read((char *)(Src1Ptr + i), sizeof(type));
+		Src2File.read((char *)(Src2Ptr + i), sizeof(type));
+	}
+	
+	Src1File.close();
+	Src2File.close();
 
 	ofstream fout("out-1.txt", ios::binary);
 
 	cl_int result(0);
+
+
 
 	vector<cl::Platform> Platforms;
 
@@ -273,7 +326,6 @@ int main()
 			//TODO описание очередей
 		#endif
 
-
 		cl::Program::Sources sources = cl::Program::Sources(source);
 		cl::Program prog = cl::Program(Context, sources, &result);
 		prog.build(); //TODO опции!!
@@ -285,15 +337,13 @@ int main()
 		//INITIAL END
 
 		cl::Kernel Kernel = cl::Kernel(prog, "simple", &result);
-
+		
 		check(result);
 
 		#ifdef _DEBUG
 			//TODO описание Кернела, аргументов и проч.
 		#endif // _DEBUG
 
-		const int Wide = 16384;
-		
 		unsigned int size = Wide * Wide * sizeof(type);
 
 		int *Mem = nullptr;
@@ -302,8 +352,14 @@ int main()
 		check(result);
 
 		//check(Kernel.setArg(0, &Memory));
-		check(Kernel.setArg(0, sizeof(cl_mem), &Memory));
-		check(Kernel.setArg(1, sizeof(int), &Wide));
+
+		cl::Buffer Src1 = cl::Buffer(Context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, size, Src1Ptr, &result);
+		cl::Buffer Src2 = cl::Buffer(Context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, size, Src2Ptr, &result);
+
+		check(Kernel.setArg(0, sizeof(cl_mem), &Src1));
+		check(Kernel.setArg(1, sizeof(cl_mem), &Src2));
+		check(Kernel.setArg(2, sizeof(cl_mem), &Memory));
+		check(Kernel.setArg(3, sizeof(int), &Wide));
 
 		cl::NDRange offset(0);
 		cl::NDRange global(Wide, Wide, 1);
@@ -318,74 +374,25 @@ int main()
 		cout << "Done!" << endl;
 
 		
-		const unsigned int BufferSize = 16384;
+		const unsigned int BufferSize = 4096;//16384
 		type Buffer[BufferSize];
 
 		for (int i(0); i < Wide*Wide/BufferSize; i++)
 		{
-			CommandQueue.enqueueReadBuffer(Memory, true, i*sizeof(Buffer), sizeof(Buffer), &Buffer, NULL, NULL);
+			//check(clEnqueueReadBuffer(CommandQueue(), Memory(), true, i*sizeof(Buffer), sizeof(Buffer), Buffer, NULL, NULL, NULL));
+			
+			CommandQueue.enqueueReadBuffer(Memory, true, i * sizeof(Buffer), sizeof(Buffer), &Buffer, NULL, NULL);
 
 			fout.write((char *)&Buffer, sizeof(Buffer)/ sizeof(char));
+			//fout << '\n';
 			fout.flush();
 		}
-		
-		/*
-		CommandQueue.enqueueReadBuffer(Memory, true, 0, sizeof(Buffer), &Buffer, NULL, NULL);
-		fout.write((char *)&Buffer, BufferSize * sizeof(int) / sizeof(char));
-		fout.flush();
-		*/
 
-		/*
-		string buf;
+		check(CommandQueue.enqueueMarkerWithWaitList());
+		//event
 
-		basic_filebuf<int> b;
-		b.open("out-3.txt", ios::ios_base::out | ios::ios_base::binary);
-
-		b.sputn(Buffer, sizeof(Buffer)-1);
-		b.close();
-		*/
-
-		/*
-		for (int i(0); i < BufferSize; i++)
-		{
-			fout << Buffer[i];
-		}
-		*/
-
-		/*
-		string temp;
-		string buf;
-		int data = 0;
-		{
-			for (int i(0); i < Wide; i++)
-			{
-				CommandQueue.enqueueReadBuffer(Memory, true, i*(Wide / BufferSize) * sizeof(Buffer), sizeof(Buffer), &Buffer, NULL, NULL);
-				for (int k(0); k < BufferSize; k++)
-				{
-					temp = std::to_string(Buffer[k]);
-					buf.insert(buf.end(), temp.begin(), temp.end());
-					buf.push_back(' ');
-				}
-				fout << buf;
-				fout << endl;
-				buf.clear();
-			}
-		}
-		*/
-
-		/*
-		int data = 0;
-		{
-			for (int i(0); i < Wide; i++)
-			{
-				CommandQueue.enqueueReadBuffer(Memory, true, i*(Wide / BufferSize)* sizeof(Buffer), sizeof(Buffer), &Buffer, NULL, NULL);
-				for (int k(0); k < BufferSize; k++)
-				{
-					fout << Buffer[k] << " ";
-				}
-				fout << endl;
-			}
-		}*/
+		delete Mem;
+		fout.close();
 	}
 
 

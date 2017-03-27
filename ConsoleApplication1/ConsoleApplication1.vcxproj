@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{19732DCC-48F3-4B19-B3B7-4A33CA6D9458}</ProjectGuid>
+    <ProjectGuid>{944C1DE8-D3EA-4FC8-B2F9-909D4596C839}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>HelloAMD</RootNamespace>
+    <RootNamespace>ConsoleApplication1</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -71,24 +71,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\AMD APP SDK\3.0\include;C:\Users\SlyFox\AMD APP SDK\3.0\include\SDKUtil;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\AMD APP SDK\3.0\lib\x86_64;C:\Users\SlyFox\AMD APP SDK\3.0\lib\x86_64;$(LibraryPath)</LibraryPath>
-    <ExecutablePath>C:\Program Files %28x86%29\AMD APP SDK\3.0\bin\x86_64;C:\Users\SlyFox\AMD APP SDK\3.0\lib\x86_64;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <ExecutablePath>C:\Program Files %28x86%29\AMD APP SDK\3.0\bin\x86_64;C:\Users\SlyFox\AMD APP SDK\3.0\lib\x86_64;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>C:\Program Files %28x86%29\AMD APP SDK\3.0\include;C:\Users\SlyFox\AMD APP SDK\3.0\include\SDKUtil;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\AMD APP SDK\3.0\lib\x86_64;C:\Users\SlyFox\AMD APP SDK\3.0\lib\x86_64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <ExecutablePath>C:\Program Files %28x86%29\AMD APP SDK\3.0\bin\x86_64;C:\Users\SlyFox\AMD APP SDK\3.0\lib\x86_64;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>C:\Program Files %28x86%29\AMD APP SDK\3.0\include;C:\Users\SlyFox\AMD APP SDK\3.0\include\SDKUtil;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\AMD APP SDK\3.0\lib\x86_64;C:\Users\SlyFox\AMD APP SDK\3.0\lib\x86_64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -108,7 +99,7 @@
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level1</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
@@ -116,8 +107,6 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <StackReserveSize>4294967296</StackReserveSize>
-      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -157,7 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
