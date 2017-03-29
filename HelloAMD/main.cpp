@@ -334,7 +334,13 @@ int main()
 
 		cl::Program::Sources sources = cl::Program::Sources(source);
 		cl::Program prog = cl::Program(Context, sources, &result);
-		prog.build(); //TODO опции!!
+
+		check(result);
+
+		check(prog.build()); //TODO опции!!
+
+		cl::string s;
+		cout<< (prog.getBuildInfo<CL_PROGRAM_BUILD_LOG>(Avaliable[0])).c_str();
 
 		#ifdef _DEBUG
 			//TODO описание программы
@@ -366,6 +372,7 @@ int main()
 		check(Kernel.setArg(1, sizeof(cl_mem), &Src2));
 		check(Kernel.setArg(2, sizeof(cl_mem), &Memory));
 		check(Kernel.setArg(3, sizeof(int), &Wide));
+		check(Kernel.setArg(4, 32768, NULL));
 
 		cl::NDRange offset(0);
 		cl::NDRange global(Wide, Wide, 1);
